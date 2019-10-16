@@ -1,91 +1,50 @@
-﻿using ExampleCSharpBot.PickemModels;
-using Newtonsoft.Json;
+﻿using ExampleCSharpBot.PickemApi;
+using ExampleCSharpBot.PickemModels;
 using System.Linq;
-using System.Net.Http;
-using System.Net.Http.Headers;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace ExampleCSharpBot
 {
     class Program
     {
-        const string PickemUserName = "SET_YOUR_USER_NAME";
-        const string PickemPassword = "SET_YOUR_PASSWORD";
-        const string PickemBotLeagueCode = "SET_LEAGUE_CODE";
-        const string PickemBaseUrl = "SET_BASE_PICKEM_URL";
+        const string PickemUserName = "???";
+        const string PickemPassword = "???";
+        const string PickemBotLeagueCode = "BOTS-NCAAF-19";
 
-        static void Main(string[] args)
+        static async Task Main(string[] args)
         {
-            RunBotAsync().GetAwaiter().GetResult();
+            await RunBotAsync();
         }
 
         static async Task RunBotAsync()
         {
+            var client = new PickEmClient(PickemBotLeagueCode);
+
             // authenticate
-            var userCredentials = new UserCredentials { UserName = PickemUserName, Password = PickemPassword };
-            var userLoggedIn = await PostToApi<UserLoggedIn>($"{PickemBaseUrl}/auth/login", userCredentials);
-            var jwt = userLoggedIn.Token;
+            var userLoggedIn = await client.Login(PickemUserName, PickemPassword);
 
             // get player tag for this user in the league
-            var player = await GetFromApi<Player>($"{PickemBaseUrl}/{PickemBotLeagueCode}/players/{PickemUserName}", jwt);
+            var player = await client.GetPlayerAsync(PickemUserName);
 
             // get pickem games for current week
             var botLeague = userLoggedIn.Leagues.Single(l => l.LeagueCode == PickemBotLeagueCode);
-            var playerScoreboard = await GetFromApi<PlayerScoreboard>(
-                $"{PickemBaseUrl}/{PickemBotLeagueCode}/{botLeague.CurrentWeekRef}/{player.PlayerTag}/scoreboard", 
-                jwt);
+            var playerScoreboard = await client.GetPlayerScoreboardAsync(botLeague.CurrentWeekRef, player.PlayerTag);
 
-            foreach ( var gamePickScoreboard in playerScoreboard.GamePickScoreboards )
+            var pick = PickTypes.Away;
+
+            foreach (var gamePickScoreboard in playerScoreboard.GamePickScoreboards)
             {
                 // THIS IS WHERE YOUR MAGIC PICK LOGIC GOES. 
-                var pick = PickTypes.Home;
 
                 // pick your pick
                 var pickUpdate = new PlayerPickUpdate { Pick = pick };
-                var playerPickResult = await PutToApi<PlayerPick>(
-                    $"{PickemBaseUrl}/{PickemBotLeagueCode}/{botLeague.CurrentWeekRef}/{player.PlayerTag}/scoreboard/{gamePickScoreboard.GameId}/pick", 
-                    pickUpdate,
-                    jwt);
+
+                var playerPickResult = await client.MakePick(botLeague.CurrentWeekRef,
+                    player.PlayerTag, gamePickScoreboard.GameId,
+                    pickUpdate);
+
+                //pick = pick == PickTypes.Home ? PickTypes.Away : PickTypes.Home;
             }
-
-        }
-
-
-        static async Task<T> GetFromApi<T>(string Url, string Jwt)
-        {
-            HttpClient httpClient = new HttpClient();
-            httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-            httpClient.DefaultRequestHeaders.Add("authorization", "Bearer " + Jwt);
-
-            var responseString = await httpClient.GetStringAsync(Url);
-
-            return JsonConvert.DeserializeObject<T>(responseString);
-        }
-
-        static async Task<T> PostToApi<T>(string Url, object postObject)
-        {
-            HttpClient httpClient = new HttpClient();
-            httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-
-            var httpResponse = await httpClient.PostAsync(Url, new StringContent(JsonConvert.SerializeObject(postObject), Encoding.UTF8, "application/json"));
-            httpResponse.EnsureSuccessStatusCode();
-            var responseString = await httpResponse.Content.ReadAsStringAsync();
-
-            return JsonConvert.DeserializeObject<T>(responseString);
-        }
-
-        static async Task<T> PutToApi<T>(string Url, object postObject, string Jwt)
-        {
-            HttpClient httpClient = new HttpClient();
-            httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-            httpClient.DefaultRequestHeaders.Add("authorization", "Bearer " + Jwt);
-
-            var httpResponse = await httpClient.PutAsync(Url, new StringContent(JsonConvert.SerializeObject(postObject), Encoding.UTF8, "application/json"));
-            httpResponse.EnsureSuccessStatusCode();
-            var responseString = await httpResponse.Content.ReadAsStringAsync();
-
-            return JsonConvert.DeserializeObject<T>(responseString);
         }
     }
 }

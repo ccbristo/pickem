@@ -1,9 +1,5 @@
-﻿using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
-
-namespace ExampleCSharpBot.PickemModels
+﻿namespace ExampleCSharpBot.PickemModels
 {
-    [JsonConverter(typeof(StringEnumConverter))]
     public enum GameStates
     {
         SpreadNotSet,
@@ -13,8 +9,6 @@ namespace ExampleCSharpBot.PickemModels
         Cancelled
     }
 
-
-    [JsonConverter(typeof(StringEnumConverter))]
     public enum GameLeaderTypes
     {
         Away,
@@ -22,14 +16,12 @@ namespace ExampleCSharpBot.PickemModels
         None
     }
 
-    [JsonConverter(typeof(StringEnumConverter))]
     public enum PickemScoringTypes
     {
         AllWinsOnePoint,
         VariablePoints,
     }
 
-    [JsonConverter(typeof(StringEnumConverter))]
     public enum PickTypes
     {
         Away,
@@ -38,7 +30,6 @@ namespace ExampleCSharpBot.PickemModels
         Hidden // THIS SHOULD NEVER be in the database (only for UI hides)
     }
 
-    [JsonConverter(typeof(StringEnumConverter))]
     public enum PickStates
     {
         Cancelled,
@@ -51,7 +42,6 @@ namespace ExampleCSharpBot.PickemModels
         Won
     }
 
-    [JsonConverter(typeof(StringEnumConverter))]
     public enum SpreadDirections
     {
         None,
