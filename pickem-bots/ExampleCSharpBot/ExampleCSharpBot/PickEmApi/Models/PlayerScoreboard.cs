@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace ExampleCSharpBot.PickemModels
+namespace ExampleCSharpBot.PickemApi.Models
 {
     public class PlayerScoreboard
     {

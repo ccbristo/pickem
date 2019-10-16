@@ -1,5 +1,5 @@
 ﻿using ExampleCSharpBot.PickemApi;
-using ExampleCSharpBot.PickemModels;
+using ExampleCSharpBot.PickemApi.Models;
 using System.Linq;
 using System.Threading.Tasks;
 

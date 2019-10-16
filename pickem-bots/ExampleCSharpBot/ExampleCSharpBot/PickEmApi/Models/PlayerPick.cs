@@ -1,4 +1,4 @@
-﻿namespace ExampleCSharpBot.PickemModels
+﻿namespace ExampleCSharpBot.PickemApi.Models
 {
     public class PlayerPick
     {

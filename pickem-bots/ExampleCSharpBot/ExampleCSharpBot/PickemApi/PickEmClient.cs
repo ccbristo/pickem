@@ -1,5 +1,5 @@
 ﻿using System.Threading.Tasks;
-using ExampleCSharpBot.PickemModels;
+using ExampleCSharpBot.PickemApi.Models;
 using RestSharp;
 using RestSharp.Authenticators;
 
