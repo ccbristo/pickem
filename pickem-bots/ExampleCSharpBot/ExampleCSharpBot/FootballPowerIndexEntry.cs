@@ -2,12 +2,17 @@
 {
     public class FootballPowerIndexEntry
     {
-        public virtual int Rank { get; set; }
-        public virtual string Team { get; set; }
-        public virtual decimal Fpi { get; set; }
+        public string Id { get; set; }
+        public int Year { get; }
+        public int WeekNumber { get; }
+        public int Rank { get; set; }
+        public string Team { get; set; }
+        public decimal Fpi { get; set; }
 
-        public FootballPowerIndexEntry(int rank, string team, decimal fpi)
+        public FootballPowerIndexEntry(int year, int weekNumber, int rank, string team, decimal fpi)
         {
+            Year = year;
+            WeekNumber = weekNumber;
             Rank = rank;
             Team = team;
             Fpi = fpi;

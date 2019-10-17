@@ -1,19 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using AngleSharp;
 using AngleSharp.Html.Dom;
-using RestSharp;
 
 namespace ExampleCSharpBot
 {
     public class EspnDataLoader
     {
         private const string _baseUrl = "http://www.espn.com/college-football/statistics/teamratings/_/year/{0}";
-        public async Task LoadEspnDataAsync()
+        public async IAsyncEnumerable<FootballPowerIndexEntry> LoadEspnDataAsync()
         {
             const int startYear = 2015;
 
@@ -64,8 +62,8 @@ namespace ExampleCSharpBot
                         var team = row.Cells[1].FirstChild.TextContent;
                         var fpi = decimal.Parse(row.Cells[7].TextContent);
 
-                        var entry = new FootballPowerIndexEntry(rank, team, fpi);
-                        //Console.WriteLine($"\t({entry.Rank}) {entry.Team} - {entry.Fpi}");
+                        var entry = new FootballPowerIndexEntry(year, weekNumber, rank, team, fpi);
+                        yield return entry;
                     }
                 }
             }
