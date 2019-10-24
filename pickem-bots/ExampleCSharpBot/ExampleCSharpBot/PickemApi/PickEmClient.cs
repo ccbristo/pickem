@@ -7,7 +7,7 @@ namespace ExampleCSharpBot.PickemApi
 {
     public class PickEmClient
     {
-        private const string PickemBaseUrl = "https://streamhead.duckdns.org/p-api/tst/api";
+        private const string PickemBaseUrl = "https://streamhead.duckdns.org/p-api/api";
         private readonly string leagueCode;
         
         private string jwt;

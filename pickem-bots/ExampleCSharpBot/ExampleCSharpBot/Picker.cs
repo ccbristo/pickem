@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
 using ExampleCSharpBot.PickemApi;
 using ExampleCSharpBot.PickemApi.Models;
@@ -25,21 +26,37 @@ namespace ExampleCSharpBot
             var botLeague = userLoggedIn.Leagues.Single(l => l.LeagueCode == PickemBotLeagueCode);
             var playerScoreboard = await client.GetPlayerScoreboardAsync(botLeague.CurrentWeekRef, player.PlayerTag);
 
-            var pick = PickTypes.Home;
-
             foreach (var gamePickScoreboard in playerScoreboard.GamePickScoreboards)
             {
-                // THIS IS WHERE YOUR MAGIC PICK LOGIC GOES. 
 
-                // pick your pick
+                PickTypes pick = GetPick(gamePickScoreboard);
                 var pickUpdate = new PlayerPickUpdate { Pick = pick };
 
                 var playerPickResult = await client.MakePick(botLeague.CurrentWeekRef,
                     player.PlayerTag, gamePickScoreboard.GameId,
                     pickUpdate);
-
-                pick = pick == PickTypes.Home ? PickTypes.Away : PickTypes.Home;
             }
+        }
+
+        private PickTypes GetPick(GameScoreboard scoreboard)
+        {
+            return (scoreboard.HomeTeamLongName, scoreboard.AwayTeamLongName) switch
+            {
+                // always pick NC State, UNC, and CU regardless of opponent
+                ("NC State", _) => PickTypes.Home,
+                (_, "NC State") => PickTypes.Away,
+                ("North Carolina", _) => PickTypes.Home,
+                (_, "North Carolina") => PickTypes.Away,
+                ("Colorado", _) => PickTypes.Home,
+                (_, "Colorado") => PickTypes.Away,
+                
+                // never pick Duke
+                ("Duke", _) => PickTypes.Away,
+                (_, "Duke") => PickTypes.Home,
+
+                // when in doubt, the team that comes alphabetically first, by first character gets the pick
+                _ => scoreboard.HomeTeamLongName[0] < scoreboard.AwayTeamLongName[0] ? PickTypes.Home : PickTypes.Away
+            };
         }
     }
 }

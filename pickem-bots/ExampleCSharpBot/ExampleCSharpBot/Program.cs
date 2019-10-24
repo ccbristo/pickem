@@ -7,28 +7,30 @@ namespace ExampleCSharpBot
     {
         static async Task Main(string[] args)
         {
-            var dataLoader = new EspnDataLoader();
-            var documentStore = new DocumentStore
-            {
-                Urls = new[] { "http://localhost:8080" },
-                Database = "pickem_predictions" 
-            };
-            documentStore.Initialize();
+            // TODO [ccb] Get scores of past games and compare matchups.
 
-            using var session = documentStore.OpenAsyncSession();
-            int count = 0;
+            //var dataLoader = new EspnDataLoader();
+            //var documentStore = new DocumentStore
+            //{
+            //    Urls = new[] { "http://localhost:8080" },
+            //    Database = "pickem_predictions" 
+            //};
+            //documentStore.Initialize();
 
-            await foreach(var entry in dataLoader.LoadEspnDataAsync())
-            {
-                await session.StoreAsync(entry);
-                count++;
+            //using var session = documentStore.OpenAsyncSession();
+            //int count = 0;
 
-                if(count > 0 && count % 1000 == 0)
-                    await session.SaveChangesAsync();
-            }
+            //await foreach(var entry in dataLoader.LoadEspnDataAsync())
+            //{
+            //    await session.StoreAsync(entry);
+            //    count++;
 
-            //var picker = new Picker();
-            //await picker.MakePicksAsync();
+            //    if(count > 0 && count % 1000 == 0)
+            //        await session.SaveChangesAsync();
+            //}
+
+            var picker = new Picker();
+            await picker.MakePicksAsync();
         }
     }
 }
