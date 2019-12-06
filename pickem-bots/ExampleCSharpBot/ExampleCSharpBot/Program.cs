@@ -1,4 +1,5 @@
 ﻿using System.Threading.Tasks;
+using Microsoft.Extensions.Configuration;
 using Raven.Client.Documents;
 
 namespace ExampleCSharpBot
@@ -29,7 +30,11 @@ namespace ExampleCSharpBot
             //        await session.SaveChangesAsync();
             //}
 
-            var picker = new Picker();
+            var config = new ConfigurationBuilder()
+                .AddJsonFile("privatesettings.json", false, true)
+                .Build();
+
+            var picker = new Picker(config["PickemUserName"], config["PickemPassword"]);
             await picker.MakePicksAsync();
         }
     }

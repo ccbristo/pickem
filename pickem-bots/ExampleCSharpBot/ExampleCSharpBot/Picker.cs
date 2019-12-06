@@ -8,19 +8,25 @@ namespace ExampleCSharpBot
 {
     public class Picker
     {
-        const string PickemUserName = "???";
-        const string PickemPassword = "???";
+        private readonly string _username;
+        private readonly string _password;
         const string PickemBotLeagueCode = "BOTS-NCAAF-19";
+
+        public Picker(string username, string password)
+        {
+            this._username = username;
+            this._password = password;
+        }
 
         public async Task MakePicksAsync()
         {
             var client = new PickEmClient(PickemBotLeagueCode);
 
             // authenticate
-            var userLoggedIn = await client.Login(PickemUserName, PickemPassword);
+            var userLoggedIn = await client.Login(_username, _password);
 
             // get player tag for this user in the league
-            var player = await client.GetPlayerAsync(PickemUserName);
+            var player = await client.GetPlayerAsync(_username);
 
             // get pickem games for current week
             var botLeague = userLoggedIn.Leagues.Single(l => l.LeagueCode == PickemBotLeagueCode);
